@@ -30,7 +30,7 @@ class VehiclesViewModel: ViewModel() {
         }
     }
 
-    fun fetchVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date) {
+    fun fetchVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date) {
         viewModelScope.launch {
             updateVehicleLocationHistory(loading = true)
             val locationHistory = processFetchResult(repository.getVehicleLocationHistory(vehicleId, startDate, endDate))

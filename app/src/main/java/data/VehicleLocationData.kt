@@ -1,6 +1,8 @@
 package data
 
-data class VehicleLocationData(var longitude: Float? = null,
-                               var latitude: Float? = null,
-                               var distance: Float? = null,
+import com.google.gson.annotations.SerializedName
+
+data class VehicleLocationData(@SerializedName("Longitude") val longitude: Float? = null,
+                               @SerializedName("Latitude") val latitude: Float? = null,
+                               @SerializedName("Distance") val distance: Float? = null,
                                var timestamp: String? = null)

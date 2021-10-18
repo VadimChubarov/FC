@@ -15,8 +15,7 @@ class VehiclesNetworkRepository {
     private val networkApi: VehiclesNetworkInterface
     private val baseUrl = "https://app.ecofleet.com/seeme/Api/Vehicles/"
     private val apiKey = ""
-
-    private val dateFormat = ""
+    private val dateFormat = "yy-mm-dd"
 
     init
     {
@@ -32,7 +31,7 @@ class VehiclesNetworkRepository {
         return processResponse(response)
     }
 
-    suspend fun getVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
+    suspend fun getVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
         val startDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(startDate)
         val endDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(endDate)
 
@@ -41,10 +40,10 @@ class VehiclesNetworkRepository {
         return processResponse(response)
     }
 
-    private fun <T>processResponse(response: Response<T>): FetchResult<T> {
+    private fun <T>processResponse(response: Response<VehiclesResponse<T>>): FetchResult<List<T>> {
         return when(response.isSuccessful)
         {
-            true -> FetchResult(data = response.body())
+            true -> FetchResult(data = response.body()?.response)
             false -> FetchResult(error = Error(response.errorBody().toString()))
         }
     }
