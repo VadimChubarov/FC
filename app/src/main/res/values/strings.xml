@@ -4,7 +4,9 @@
     <string name="location_history_screen_title">Location History: %1$s</string>
     <string name="vehicle_title_pattern">%1$s / %2$s</string>
     <string name="vehicle_speed_pattern">%1$s km/h</string>
-    <string name="vehicle_time_minutes_pattern">%1$dm %2$ds ago</string>
+    <string name="vehicle_time_minutes_seconds_pattern">%1$dm %2$ds ago</string>
+    <string name="vehicle_time_minutes_pattern">%1$dm ago</string>
     <string name="vehicle_time_hours_pattern">%1$dh ago</string>
+    <string name="vehicle_time_seconds_pattern">%1$ds ago</string>
 
 </resources>

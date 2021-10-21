@@ -1,8 +1,10 @@
 package data
 
-data class VehicleData(val objectId: String? = null,
-                       val plate: String? = null,
-                       val driverName: String? = null,
-                       val address: String? = null,
-                       val speed: String? = null,
-                       val timestamp: String? = null)
+import com.google.gson.annotations.SerializedName
+
+data class VehicleData(@SerializedName("objectId") val objectId: String?,
+                       @SerializedName("plate") val plate: String?,
+                       @SerializedName("driverName") val driverName: String?,
+                       @SerializedName("address") val address: String?,
+                       @SerializedName("speed") val speed: String?,
+                       @SerializedName("timestamp") val timestamp: String?)

@@ -9,15 +9,15 @@ import vehicles_viewmodel.VehiclesViewModel
 
 class VehiclesActivity : AppCompatActivity() {
 
+    lateinit var viewBinding: ActivityVehiclesBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewBinding = ActivityVehiclesBinding.inflate(layoutInflater)
+        viewBinding = ActivityVehiclesBinding.inflate(layoutInflater)
 
         viewBinding.imageKey.setOnClickListener { showApiKeyDialog() }
-
-        viewBinding.vehiclesList.adapter =
-
+        viewBinding.vehiclesList.adapter = VehiclesAdapter(viewBinding.root.context, this::onVehicleSelected)
 
         val viewModel: VehiclesViewModel by viewModels()
 
@@ -29,8 +29,10 @@ class VehiclesActivity : AppCompatActivity() {
 
     }
 
-    private fun showVehicles(data: VehiclesViewModel.ViewModelData<VehicleData>) {
+    private fun showVehicles(data: VehiclesViewModel.ViewModelData<VehicleData>) =
+        (viewBinding.vehiclesList.adapter as VehiclesAdapter).updateItems(data.result)
 
+    private fun onVehicleSelected(vehicleData: VehicleData) {
 
     }
 }
