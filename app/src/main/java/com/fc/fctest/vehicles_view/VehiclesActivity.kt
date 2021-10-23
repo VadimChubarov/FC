@@ -2,7 +2,6 @@ package com.fc.fctest.vehicles_view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.fc.fctest.databinding.ActivityVehiclesBinding
@@ -21,8 +20,15 @@ class VehiclesActivity : AppCompatActivity() {
 
         val viewModel: VehiclesViewModel by viewModels()
 
+        viewBinding.topAppBar.navigationIcon = null
         viewBinding.imageKey.setOnClickListener { showApiKeyDialog() }
         viewBinding.vehiclesList.adapter = VehiclesAdapter(viewBinding.root.context, this::onVehicleSelected)
+
+        viewBinding.swipeToRefreshLayout.setOnRefreshListener {
+            if(!viewModel.getFetchPending().value!!) {
+                viewModel.fetchVehicles()
+            }
+        }
 
         viewModel.getVehicles().observe(this, this::showVehicles)
         viewModel.getFetchPending().observe(this, this::showLoading)
@@ -40,7 +46,7 @@ class VehiclesActivity : AppCompatActivity() {
     }
 
     private fun showLoading(loading: Boolean) {
-        viewBinding.loadingProgress.visibility = if(loading) View.VISIBLE else View.GONE
+        viewBinding.swipeToRefreshLayout.isRefreshing = loading
     }
 
     private fun showError(error: String?) {

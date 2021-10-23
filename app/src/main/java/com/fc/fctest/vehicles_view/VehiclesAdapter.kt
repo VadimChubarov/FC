@@ -62,8 +62,16 @@ class VehiclesAdapter(private val context: Context, private val selectCallback: 
             return emptyDataPlaceholder
 
         val duration = currentTime.time - time.time
-
         val hours = DurationUnit.MILLISECONDS.toHours(duration)
+
+        val years = (hours / 8760).toInt()
+        if(years > 0)
+            return context.resources.getString(R.string.vehicle_time_years_pattern, years)
+
+        val weeks = (hours / 168).toInt()
+        if(weeks > 0)
+            return context.resources.getString(R.string.vehicle_time_weeks_pattern, weeks)
+
         if(hours > 0)
             return context.resources.getString(R.string.vehicle_time_hours_pattern, hours)
 

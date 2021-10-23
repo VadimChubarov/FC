@@ -44,27 +44,24 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/vehicles_list"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_to_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="5dp"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/vehicle_item_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar" />
+        app:layout_constraintTop_toBottomOf="@+id/topAppBar">
 
-    <ProgressBar
-        android:id="@+id/loading_progress"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="@+id/vehicles_list"
-        app:layout_constraintEnd_toEndOf="@+id/vehicles_list"
-        app:layout_constraintStart_toStartOf="@+id/vehicles_list"
-        app:layout_constraintTop_toBottomOf="@+id/topAppBar"
-        android:visibility="gone"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/vehicles_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/vehicle_item_layout" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

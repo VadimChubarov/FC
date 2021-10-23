@@ -2,6 +2,8 @@ package vehicles_model.network
 
 import data.VehicleData
 import data.VehicleLocationData
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -18,14 +20,19 @@ class VehiclesNetworkRepository {
 
     init
     {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(ApiInterceptor())
+            .build()
+
         networkApi = Retrofit.Builder()
             .baseUrl(baseUrl)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(VehiclesNetworkInterface::class.java)
     }
 
     suspend fun getVehicles(): FetchResult<List<VehicleData>> {
-        val response = networkApi.getVehicles(apiKey)
+        val response = networkApi.getVehicles()
 
         return processResponse(response)
     }
@@ -34,7 +41,7 @@ class VehiclesNetworkRepository {
         val startDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(startDate)
         val endDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(endDate)
 
-        val response = networkApi.getVehicleLocationHistory(apiKey, vehicleId, startDateString, endDateString)
+        val response = networkApi.getVehicleLocationHistory(vehicleId, startDateString, endDateString)
 
         return processResponse(response)
     }
@@ -44,6 +51,20 @@ class VehiclesNetworkRepository {
         {
             true -> FetchResult.FetchData(response.body()?.response)
             false -> FetchResult.FetchError(response.errorBody().toString())
+        }
+    }
+
+    private inner class ApiInterceptor: Interceptor {
+
+        override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+            val request = chain.request()
+
+            val url = request.url.newBuilder()
+                .addQueryParameter("key", apiKey)
+                .addQueryParameter("json", "true")
+                .build()
+
+            return chain.proceed(request.newBuilder().url(url).build())
         }
     }
 }
