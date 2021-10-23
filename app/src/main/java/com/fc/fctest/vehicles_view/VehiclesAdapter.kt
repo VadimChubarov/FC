@@ -21,6 +21,7 @@ class VehiclesAdapter(private val context: Context, private val selectCallback: 
     fun updateItems(items: Collection<VehicleData>) {
         vehicles.clear()
         vehicles.addAll(items)
+        notifyItemRangeChanged(0, itemCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VehicleViewHolder(VehicleItemLayoutBinding.inflate(LayoutInflater.from(context), parent, false))

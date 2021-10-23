@@ -1,8 +1,7 @@
 package vehicles_model
 
-class FetchResult<T>(val data: T? = null, val error: Error? = null) {
-    fun hasData() = data != null
-    fun hasError() = error != null
+sealed interface FetchResult<T> {
+    class FetchData<T>(val data: T? = null): FetchResult<T>
+    class FetchError<T>(val message: String): FetchResult<T>
+    class FetchPending<T>(val pending: Boolean): FetchResult<T>
 }
-
-class Error(val message: String)

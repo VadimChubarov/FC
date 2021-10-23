@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import data.VehicleData
 import data.VehicleLocationData
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import vehicles_model.FetchResult
 import vehicles_model.VehiclesRepository
@@ -15,53 +16,37 @@ class VehiclesViewModel: ViewModel() {
 
     private val repository = VehiclesRepository.get()
 
-    private val vehiclesList = MutableLiveData<ViewModelData<VehicleData>>(ViewModelData())
-    private val vehicleLocationHistory = MutableLiveData<ViewModelData<VehicleLocationData>>(ViewModelData())
+    private val vehiclesList = MutableLiveData<List<VehicleData>>(mutableListOf())
+    private val vehicleLocationHistory = MutableLiveData<List<VehicleLocationData>>(mutableListOf())
     private val dataFetchError = MutableLiveData<String?>(null)
+    private val dataFetchPending = MutableLiveData(false)
 
-    fun getVehicles(): LiveData<ViewModelData<VehicleData>> = vehiclesList
-    fun getVehicleLocationHistory(): LiveData<ViewModelData<VehicleLocationData>> = vehicleLocationHistory
+    fun getVehicles(): LiveData<List<VehicleData>> = vehiclesList
+    fun getVehicleLocationHistory(): LiveData<List<VehicleLocationData>> = vehicleLocationHistory
+    fun getFetchPending(): LiveData<Boolean> = dataFetchPending
+    fun getFetchError(): LiveData<String?> = dataFetchError
 
     fun fetchVehicles() {
         viewModelScope.launch {
-            updateVehicleList(loading = true)
-            val vehiclesData = processFetchResult(repository.getVehicles())
-            updateVehicleList(false, vehiclesData)
+            repository.getVehicles().collect {
+                when(it) {
+                    is FetchResult.FetchData -> { vehiclesList.value = it.data }
+                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending}
+                    is FetchResult.FetchError -> { dataFetchError.value = it.message }
+                }
+            }
         }
     }
 
     fun fetchVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date) {
         viewModelScope.launch {
-            updateVehicleLocationHistory(loading = true)
-            val locationHistory = processFetchResult(repository.getVehicleLocationHistory(vehicleId, startDate, endDate))
-            updateVehicleLocationHistory(false, locationHistory)
-        }
-    }
-
-    private fun <T>processFetchResult(fetchResult: FetchResult<T>): T? {
-        return when(fetchResult.hasData())
-        {
-            true -> fetchResult.data
-
-            false ->
-            {
-                if(fetchResult.hasError())
-                    dataFetchError.value = fetchResult.error?.message
-
-                null
+            repository.getVehicleLocationHistory(vehicleId, startDate, endDate).collect {
+                when(it) {
+                    is FetchResult.FetchData -> { vehicleLocationHistory.value = it.data }
+                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
+                    is FetchResult.FetchError -> { dataFetchError.value = it.message }
+                }
             }
         }
     }
-
-    private fun updateVehicleList(loading: Boolean = false, data: List<VehicleData>? = null) {
-        val updateData: List<VehicleData> = data ?: vehiclesList.value!!.result
-        vehiclesList.value = ViewModelData(loading, updateData)
-    }
-
-    private fun updateVehicleLocationHistory(loading: Boolean = false, data: List<VehicleLocationData>? = null) {
-        val updateData: List<VehicleLocationData> = data ?: mutableListOf()
-        vehicleLocationHistory.value = ViewModelData(loading, updateData)
-    }
-
-    class ViewModelData<T>(val loading: Boolean = false, val result: List<T> = mutableListOf())
 }

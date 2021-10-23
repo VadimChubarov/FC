@@ -6,7 +6,6 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vehicles_model.FetchResult
-import vehicles_model.Error
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,11 +39,11 @@ class VehiclesNetworkRepository {
         return processResponse(response)
     }
 
-    private fun <T>processResponse(response: Response<VehiclesResponse<T>>): FetchResult<List<T>> {
+    private fun <T>processResponse(response: Response<VehiclesResponse<T>>): FetchResult<T> {
         return when(response.isSuccessful)
         {
-            true -> FetchResult(data = response.body()?.response)
-            false -> FetchResult(error = Error(response.errorBody().toString()))
+            true -> FetchResult.FetchData(response.body()?.response)
+            false -> FetchResult.FetchError(response.errorBody().toString())
         }
     }
 }
