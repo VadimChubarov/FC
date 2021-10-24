@@ -2,13 +2,13 @@ package vehicles_model.network
 
 import data.VehicleData
 import data.VehicleLocationData
+import getDateString
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vehicles_model.FetchResult
-import java.text.SimpleDateFormat
 import java.util.*
 
 class VehiclesNetworkRepository {
@@ -16,7 +16,7 @@ class VehiclesNetworkRepository {
     private val networkApi: VehiclesNetworkInterface
     private val baseUrl = "https://app.ecofleet.com/seeme/Api/Vehicles/"
     private var apiKey = ""
-    private val dateFormat = "yy-mm-dd"
+    private val dateFormat = "yy-MM-dd"
 
     init
     {
@@ -40,8 +40,8 @@ class VehiclesNetworkRepository {
     }
 
     suspend fun getVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
-        val startDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(startDate)
-        val endDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(endDate)
+        val startDateString = getDateString(startDate, dateFormat)!!
+        val endDateString = getDateString(endDate, dateFormat)!!
 
         return processResponse { networkApi.getVehicleLocationHistory(vehicleId, startDateString, endDateString) }
     }

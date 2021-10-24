@@ -11,4 +11,9 @@ fun getDate(timestamp: String): Date? {
     catch (e: ParseException) { null }
 }
 
+fun getDateString(date: Date, format: String): String? {
+    return try { SimpleDateFormat(format, Locale.ENGLISH).format(date) }
+    catch (e: ParseException) { null }
+}
+
 

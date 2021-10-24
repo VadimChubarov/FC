@@ -13,7 +13,7 @@ import vehicles_viewmodel.VehiclesViewModel
 
 class VehiclesActivity : AppCompatActivity() {
 
-    lateinit var viewBinding: ActivityVehiclesBinding
+    private lateinit var viewBinding: ActivityVehiclesBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +73,13 @@ class VehiclesActivity : AppCompatActivity() {
     }
 
     private fun onVehicleSelected(vehicleData: VehicleData) {
+        if(vehicleData.objectId.isNullOrEmpty())
+            return
 
+        val fragment = LocationHistoryFragment()
+        val args = Bundle()
+        args.putString(LocationHistoryFragment.VEHICLE_ID, vehicleData.objectId)
+        fragment.arguments = args
+        fragment.show(supportFragmentManager, LocationHistoryFragment.TAG)
     }
 }
