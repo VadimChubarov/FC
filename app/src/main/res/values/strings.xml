@@ -10,5 +10,10 @@
     <string name="vehicle_time_minutes_pattern">%1$dm ago</string>
     <string name="vehicle_time_hours_pattern">%1$dh ago</string>
     <string name="vehicle_time_seconds_pattern">%1$ds ago</string>
+    <string name="dialog_options_ok">OK</string>
+    <string name="dialog_options_cancel">Cancel</string>
+    <string name="dialog_title">Enter Api key</string>
+    <string name="dialog_edit_title">Api key</string>
+    <string name="dialog_edit_error">Please enter Api key</string>
 
 </resources>

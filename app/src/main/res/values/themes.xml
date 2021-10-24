@@ -9,6 +9,12 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+        <item name="textInputStyle">@style/AppTextField</item>
+        <item name="editTextStyle">@style/AppTextField</item>
+
+        <item name="materialAlertDialogTheme">@style/MyThemeOverlay.MaterialAlertDialog</item>
+
     </style>
 
     <style name="PrimaryTextStyle">
@@ -21,7 +27,23 @@
     </style>
 
     <style name="SecondaryTextStyle" parent="PrimaryTextStyle">
-        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textColor">@color/secondary_darker</item>
+    </style>
+
+    <style name="AppTextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="boxBackgroundColor">@color/secondary</item>
+        <item name="counterTextAppearance">@style/PrimaryTextStyle</item>
+    </style>
+
+    <style name="MyThemeOverlay.MaterialAlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/DialogButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+
+    <style name="DialogButtonStyle" parent="@style/Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
 </resources>

@@ -21,6 +21,7 @@ class VehiclesAdapter(private val context: Context, private val selectCallback: 
     fun updateItems(items: Collection<VehicleData>) {
         vehicles.clear()
         vehicles.addAll(items)
+        vehicles.sortByDescending { item -> item.timestamp?.let { timestamp -> getDate(timestamp) } }
         notifyItemRangeChanged(0, itemCount)
     }
 

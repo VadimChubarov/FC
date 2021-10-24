@@ -7,7 +7,7 @@
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
     android:layout_margin="2dp"
-    android:background="@color/primary">
+    android:background="@color/secondary">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/vehicle_title"

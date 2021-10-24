@@ -15,7 +15,7 @@ class VehiclesNetworkRepository {
 
     private val networkApi: VehiclesNetworkInterface
     private val baseUrl = "https://app.ecofleet.com/seeme/Api/Vehicles/"
-    private val apiKey = ""
+    private var apiKey = ""
     private val dateFormat = "yy-mm-dd"
 
     init
@@ -29,6 +29,10 @@ class VehiclesNetworkRepository {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(VehiclesNetworkInterface::class.java)
+    }
+
+    fun updateApiKey(apiKey: String) {
+        this.apiKey = apiKey
     }
 
     suspend fun getVehicles(): FetchResult<List<VehicleData>> {

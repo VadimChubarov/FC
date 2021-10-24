@@ -26,12 +26,17 @@ class VehiclesViewModel: ViewModel() {
     fun getFetchPending(): LiveData<Boolean> = dataFetchPending
     fun getFetchError(): LiveData<String?> = dataFetchError
 
+    fun onApiKeySelected(apiKey: String) {
+        repository.updateApiKey(apiKey)
+        fetchVehicles()
+    }
+
     fun fetchVehicles() {
         viewModelScope.launch {
             repository.getVehicles().collect {
                 when(it) {
                     is FetchResult.FetchData -> { vehiclesList.value = it.data }
-                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending}
+                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
                     is FetchResult.FetchError -> { dataFetchError.value = it.message }
                 }
             }

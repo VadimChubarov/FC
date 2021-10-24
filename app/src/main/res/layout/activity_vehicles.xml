@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".vehicles_view.VehiclesActivity"
-    android:background="@color/secondary">
+    android:background="@color/primary">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
@@ -13,7 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/vehicles_screen_title">
+        app:title="@string/vehicles_screen_title"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp"
+        android:background="@color/secondary">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -27,8 +31,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="@string/vehicles_screen_title"
-                android:textSize="20sp"/>
+                android:text="@string/vehicles_screen_title" />
 
             <ImageView
                 android:id="@+id/image_key"
@@ -36,10 +39,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="25dp"
                 android:padding="10dp"
+                android:src="@drawable/ic_key"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@drawable/ic_key"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.MaterialToolbar>

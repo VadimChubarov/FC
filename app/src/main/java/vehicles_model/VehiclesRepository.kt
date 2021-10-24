@@ -18,6 +18,10 @@ class VehiclesRepository private constructor() : VehiclesRepositoryInterface {
 
     private val networkRepository = VehiclesNetworkRepository()
 
+    override fun updateApiKey(apiKey: String) {
+       networkRepository.updateApiKey(apiKey)
+    }
+
     override suspend fun getVehicles(): Flow<FetchResult<List<VehicleData>>> {
         return flow {
 

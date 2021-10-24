@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import com.fc.fctest.R
 import com.fc.fctest.databinding.ActivityVehiclesBinding
+import com.fc.fctest.databinding.ApiKeyDialogBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import data.VehicleData
 import vehicles_viewmodel.VehiclesViewModel
 
@@ -20,7 +23,6 @@ class VehiclesActivity : AppCompatActivity() {
 
         val viewModel: VehiclesViewModel by viewModels()
 
-        viewBinding.topAppBar.navigationIcon = null
         viewBinding.imageKey.setOnClickListener { showApiKeyDialog() }
         viewBinding.vehiclesList.adapter = VehiclesAdapter(viewBinding.root.context, this::onVehicleSelected)
 
@@ -38,7 +40,26 @@ class VehiclesActivity : AppCompatActivity() {
     }
 
     private fun showApiKeyDialog() {
+        val viewModel: VehiclesViewModel by viewModels()
 
+        val dialogViewBinding = ApiKeyDialogBinding.inflate(layoutInflater)
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(dialogViewBinding.root)
+            .create()
+
+        dialogViewBinding.dialogButtonOk.setOnClickListener {
+            val apiKey = dialogViewBinding.apiKeyInput.editText!!.text.toString()
+
+            if(apiKey.isNotEmpty()) {
+                viewModel.onApiKeySelected(apiKey)
+                dialog.dismiss()
+            }
+            else
+                dialogViewBinding.apiKeyInput.error = this.getString(R.string.dialog_edit_error)
+        }
+        dialogViewBinding.dialogButtonCancel.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
     }
 
     private fun showVehicles(data: List<VehicleData>) {
