@@ -15,5 +15,6 @@
     <string name="dialog_title">Enter Api key</string>
     <string name="dialog_edit_title">Api key</string>
     <string name="dialog_edit_error">Please enter Api key</string>
+    <string name="fetch_error_message">Can\'t update data, code : %1$s. Please try later</string>
 
 </resources>

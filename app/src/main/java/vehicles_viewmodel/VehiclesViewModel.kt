@@ -21,6 +21,11 @@ class VehiclesViewModel: ViewModel() {
     private val dataFetchError = MutableLiveData<String?>(null)
     private val dataFetchPending = MutableLiveData(false)
 
+    init
+    {
+        fetchVehicles()
+    }
+
     fun getVehicles(): LiveData<List<VehicleData>> = vehiclesList
     fun getVehicleLocationHistory(): LiveData<List<VehicleLocationData>> = vehicleLocationHistory
     fun getFetchPending(): LiveData<Boolean> = dataFetchPending
@@ -37,7 +42,10 @@ class VehiclesViewModel: ViewModel() {
                 when(it) {
                     is FetchResult.FetchData -> { vehiclesList.value = it.data }
                     is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
-                    is FetchResult.FetchError -> { dataFetchError.value = it.message }
+                    is FetchResult.FetchError -> {
+                        dataFetchError.value = it.message
+                        dataFetchError.value = null
+                    }
                 }
             }
         }
@@ -49,7 +57,10 @@ class VehiclesViewModel: ViewModel() {
                 when(it) {
                     is FetchResult.FetchData -> { vehicleLocationHistory.value = it.data }
                     is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
-                    is FetchResult.FetchError -> { dataFetchError.value = it.message }
+                    is FetchResult.FetchError -> {
+                        dataFetchError.value = it.message
+                        dataFetchError.value = null
+                    }
                 }
             }
         }

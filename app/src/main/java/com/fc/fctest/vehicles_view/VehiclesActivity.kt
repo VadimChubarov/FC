@@ -35,8 +35,6 @@ class VehiclesActivity : AppCompatActivity() {
         viewModel.getVehicles().observe(this, this::showVehicles)
         viewModel.getFetchPending().observe(this, this::showLoading)
         viewModel.getFetchError().observe(this, this::showError)
-
-        viewModel.fetchVehicles()
     }
 
     private fun showApiKeyDialog() {
@@ -71,7 +69,7 @@ class VehiclesActivity : AppCompatActivity() {
     }
 
     private fun showError(error: String?) {
-        error?.let {  Toast.makeText(this, it, Toast.LENGTH_LONG) }
+        error?.let {  Toast.makeText(this, this.getString(R.string.fetch_error_message, error), Toast.LENGTH_LONG).show() }
     }
 
     private fun onVehicleSelected(vehicleData: VehicleData) {

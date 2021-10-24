@@ -36,25 +36,26 @@ class VehiclesNetworkRepository {
     }
 
     suspend fun getVehicles(): FetchResult<List<VehicleData>> {
-        val response = networkApi.getVehicles()
-
-        return processResponse(response)
+        return processResponse { networkApi.getVehicles() }
     }
 
     suspend fun getVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
         val startDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(startDate)
         val endDateString = SimpleDateFormat(dateFormat, Locale.ENGLISH).format(endDate)
 
-        val response = networkApi.getVehicleLocationHistory(vehicleId, startDateString, endDateString)
-
-        return processResponse(response)
+        return processResponse { networkApi.getVehicleLocationHistory(vehicleId, startDateString, endDateString) }
     }
 
-    private fun <T>processResponse(response: Response<VehiclesResponse<T>>): FetchResult<T> {
-        return when(response.isSuccessful)
-        {
-            true -> FetchResult.FetchData(response.body()?.response)
-            false -> FetchResult.FetchError(response.errorBody().toString())
+    private suspend fun <T>processResponse(request: suspend () -> Response<VehiclesResponse<T>>): FetchResult<T> {
+        return try {
+            val response = request.invoke()
+
+            when(response.isSuccessful) {
+                true -> FetchResult.FetchData(response.body()?.response)
+                false -> FetchResult.FetchError(response.code().toString())
+            }
+        } catch(e: Throwable) {
+            FetchResult.FetchError(e.message.toString())
         }
     }
 
