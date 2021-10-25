@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#aeaeae</color>
+    <color name="primary_darker">#aeaeae</color>
     <color name="secondary">#FFFFFF</color>
     <color name="secondary_darker">#aeaeae</color>
 </resources>

@@ -32,9 +32,11 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         viewBinding = LocationHistoryFragmentBinding.inflate(inflater, container, false)
         datePicker = DatePicker(requireContext())
+
         viewBinding.locationHistoryTitle.text = this.context?.getString(R.string.location_history_pattern, vehicleId)
         viewBinding.dateInput.editText?.inputType = InputType.TYPE_NULL
         viewBinding.setDateImage.setOnClickListener { showDatePicker() }
+        viewBinding.topAppBar.setNavigationOnClickListener { dismiss() }
 
         selectDate(selectedDate)
 
