@@ -8,6 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.fc.fctest.R
 import com.fc.fctest.databinding.LocationHistoryFragmentBinding
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -40,6 +44,12 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         selectDate(selectedDate)
 
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
+        mapFragment.getMapAsync {
+
+            
+        }
+
         return viewBinding.root
     }
 
@@ -47,6 +57,7 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
         return super.onCreateDialog(savedInstanceState).apply {
             setOnShowListener { bottomSheet ->
                 (bottomSheet as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                bottomSheet.behavior.isDraggable = false
             }
         }
     }

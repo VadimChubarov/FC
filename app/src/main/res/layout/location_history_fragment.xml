@@ -69,13 +69,11 @@
 
     </RelativeLayout>
 
-    <FrameLayout
-        android:id="@+id/map_layout"
+    <fragment
+        android:id="@+id/map_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/enter_date_layout">
-
-
-    </FrameLayout>
+        android:layout_below="@+id/enter_date_layout"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
 </RelativeLayout>
