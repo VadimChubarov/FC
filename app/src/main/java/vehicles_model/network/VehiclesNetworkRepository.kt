@@ -47,16 +47,20 @@ class VehiclesNetworkRepository {
     }
 
     private suspend fun <T>processResponse(request: suspend () -> Response<VehiclesResponse<T>>): FetchResult<T> {
-        return try {
-            val response = request.invoke()
 
-            when(response.isSuccessful) {
-                true -> FetchResult.FetchData(response.body()?.response)
-                false -> FetchResult.FetchError(response.code().toString())
+        return if(apiKey.isNotEmpty()) {
+            try {
+                val response = request.invoke()
+
+                when (response.isSuccessful) {
+                    true -> FetchResult.FetchData(response.body()?.response)
+                    false -> FetchResult.FetchError(response.code().toString())
+                }
+            } catch (e: Throwable) {
+                FetchResult.FetchError(e.message.toString())
             }
-        } catch(e: Throwable) {
-            FetchResult.FetchError(e.message.toString())
-        }
+        } else
+            FetchResult.FetchError("Missing api key")
     }
 
     private inner class ApiInterceptor: Interceptor {
