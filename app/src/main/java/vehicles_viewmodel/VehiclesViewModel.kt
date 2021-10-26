@@ -73,12 +73,16 @@ class VehiclesViewModel: ViewModel() {
                 when(fetchResult) {
                     is FetchResult.FetchData -> { vehicleLocationHistory.value = createMapRouteData(fetchResult.data!!)  }
                     is FetchResult.FetchPending -> { locationFetchPending.value = fetchResult.pending }
-                    is FetchResult.FetchError -> {
-                        dataFetchError.value = fetchResult.message
-                        dataFetchError.value = null
-                    }
+                    is FetchResult.FetchError -> { handleError(fetchResult) }
                 }
             }
+        }
+    }
+
+    private fun <T>handleError(error: FetchResult.FetchError<T>) {
+        if(!error.isCanceled()) {
+            dataFetchError.value = error.message
+            dataFetchError.value = null
         }
     }
 

@@ -108,7 +108,6 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
         }
 
         map?.let { map ->
-
             showPolyline(map, mapRouteData)
             showMarkers(map, mapRouteData)
 
@@ -166,6 +165,10 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
     }
 
     private fun showLoading(loading: Boolean) {
+        val viewModel: VehiclesViewModel by activityViewModels()
+        if(!loading && viewModel.getVehicleLocationHistory().value == null)
+            return
+
         viewBinding.mapProgress.visibility = if(loading) View.VISIBLE else View.GONE
         enableDateSelection(!loading)
 

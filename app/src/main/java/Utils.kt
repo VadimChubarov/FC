@@ -32,7 +32,7 @@ fun setTime(date: Date, hours: Int, minutes: Int, seconds: Int): Date {
 fun addDays(date: Date, days: Int): Date {
     val calendar = Calendar.getInstance()
     calendar.time = date.clone() as Date
-    calendar.add(Calendar.DATE, 1)
+    calendar.add(Calendar.DATE, days)
     return calendar.time
 }
 
