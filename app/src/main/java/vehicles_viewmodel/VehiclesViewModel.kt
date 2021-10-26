@@ -52,14 +52,18 @@ class VehiclesViewModel: ViewModel() {
         fetchVehicleLocationHistory(vehicleId, date, addDays(date, 1))
     }
 
+    fun onLocationDataCancel() {
+        repository.cancelVehicleLocationRequests()
+    }
+
     fun fetchVehicles() {
         viewModelScope.launch {
-            repository.getVehicles().collect {
-                when(it) {
-                    is FetchResult.FetchData -> { vehiclesList.value = it.data!! }
-                    is FetchResult.FetchPending -> { vehiclesFetchPending.value = it.pending }
+            repository.getVehicles().collect { fetchResult ->
+                when(fetchResult) {
+                    is FetchResult.FetchData -> { vehiclesList.value = fetchResult.data!! }
+                    is FetchResult.FetchPending -> { vehiclesFetchPending.value = fetchResult.pending }
                     is FetchResult.FetchError -> {
-                        dataFetchError.value = it.message
+                        dataFetchError.value = fetchResult.message
                         dataFetchError.value = null
                     }
                 }

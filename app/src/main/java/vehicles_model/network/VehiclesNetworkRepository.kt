@@ -40,19 +40,20 @@ class VehiclesNetworkRepository {
     }
 
     suspend fun getVehicles(): FetchResult<List<VehicleData>> {
-        val tag = VehiclesNetworkInterface.VEHICLES_TAG
-        cancelPending(tag)
-        return processResponse { networkApi.getVehicles(tag) }
+        return processResponse { networkApi.getVehicles() }
     }
 
     suspend fun getVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
-        val tag = VehiclesNetworkInterface.VEHICLE_LOCATION_TAG
-        cancelPending(tag)
-
         val startDateString = getDateString(startDate, dateFormat)!!
         val endDateString = getDateString(endDate, dateFormat)!!
 
-        return processResponse { networkApi.getVehicleLocationHistory(tag, vehicleId, startDateString, endDateString) }
+        return processResponse {
+            networkApi.getVehicleLocationHistory(VehiclesNetworkInterface.VEHICLE_LOCATION_TAG, vehicleId, startDateString, endDateString)
+        }
+    }
+
+    fun cancelVehicleLocationRequests() {
+        cancelPending(VehiclesNetworkInterface.VEHICLE_LOCATION_TAG)
     }
 
     private suspend fun <T>processResponse(request: suspend () -> Response<VehiclesResponse<T>>): FetchResult<T> {

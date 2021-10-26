@@ -11,12 +11,11 @@ import retrofit2.http.Query
 interface VehiclesNetworkInterface {
 
     companion object {
-        const val VEHICLES_TAG = "vehicles"
         const val VEHICLE_LOCATION_TAG = "vehicle_location"
     }
 
     @GET("getLastData")
-    suspend fun getVehicles(@Header("tag") tag: String): Response<VehiclesResponse<List<VehicleData>>>
+    suspend fun getVehicles(): Response<VehiclesResponse<List<VehicleData>>>
 
     @GET("getRawData")
     suspend fun getVehicleLocationHistory(@Header("tag") tag: String,

@@ -42,4 +42,8 @@ class VehiclesRepository private constructor() : VehiclesRepositoryInterface {
 
         }.flowOn(Dispatchers.IO)
     }
+
+    override fun cancelVehicleLocationRequests() {
+        networkRepository.cancelVehicleLocationRequests()
+    }
 }

@@ -1,6 +1,7 @@
 package com.fc.fctest.vehicles_view
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -83,6 +84,15 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
                 (bottomSheet as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 bottomSheet.behavior.isDraggable = false
             }
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+
+        if(isLoading() && !requireActivity().isChangingConfigurations) {
+            val viewModel: VehiclesViewModel by activityViewModels()
+            viewModel.onLocationDataCancel()
         }
     }
 
