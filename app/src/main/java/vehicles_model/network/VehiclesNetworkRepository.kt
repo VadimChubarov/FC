@@ -10,6 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import vehicles_model.FetchResult
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class VehiclesNetworkRepository {
 
@@ -22,6 +23,8 @@ class VehiclesNetworkRepository {
     {
         val client = OkHttpClient.Builder()
             .addInterceptor(ApiInterceptor())
+            .readTimeout(5, TimeUnit.MINUTES)
+            .connectTimeout(5, TimeUnit.MINUTES)
             .build()
 
         networkApi = Retrofit.Builder()
@@ -39,7 +42,7 @@ class VehiclesNetworkRepository {
         return processResponse { networkApi.getVehicles() }
     }
 
-    suspend fun getVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
+    suspend fun getVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
         val startDateString = getDateString(startDate, dateFormat)!!
         val endDateString = getDateString(endDate, dateFormat)!!
 

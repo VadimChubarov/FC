@@ -76,4 +76,20 @@
         android:layout_below="@+id/enter_date_layout"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/distance_text"
+        style="@style/PrimaryTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp" />
+
+    <ProgressBar
+        android:id="@+id/map_progress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
 </RelativeLayout>

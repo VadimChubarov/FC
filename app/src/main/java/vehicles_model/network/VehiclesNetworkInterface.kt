@@ -13,7 +13,7 @@ interface VehiclesNetworkInterface {
     suspend fun getVehicles(): Response<VehiclesResponse<List<VehicleData>>>
 
     @GET("getRawData")
-    suspend fun getVehicleLocationHistory(@Query("objectId") objectId: Long,
+    suspend fun getVehicleLocationHistory(@Query("objectId") objectId: String,
                                           @Query("begTimestamp") begTimestamp: String,
                                           @Query("endTimestamp") endTimestamp: String): Response<VehiclesResponse<List<VehicleLocationData>>>
 }

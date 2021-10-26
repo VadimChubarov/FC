@@ -1,5 +1,6 @@
 package vehicles_viewmodel
 
+import addDays
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,7 +20,9 @@ class VehiclesViewModel: ViewModel() {
     private val vehiclesList = MutableLiveData<List<VehicleData>>(mutableListOf())
     private val vehicleLocationHistory = MutableLiveData<List<VehicleLocationData>>(mutableListOf())
     private val dataFetchError = MutableLiveData<String?>(null)
-    private val dataFetchPending = MutableLiveData(false)
+    private val vehiclesFetchPending = MutableLiveData(false)
+    private val locationFetchPending = MutableLiveData(false)
+    private val locationDate = MutableLiveData(Date())
 
     init
     {
@@ -28,7 +31,9 @@ class VehiclesViewModel: ViewModel() {
 
     fun getVehicles(): LiveData<List<VehicleData>> = vehiclesList
     fun getVehicleLocationHistory(): LiveData<List<VehicleLocationData>> = vehicleLocationHistory
-    fun getFetchPending(): LiveData<Boolean> = dataFetchPending
+    fun getVehiclesFetchPending(): LiveData<Boolean> = vehiclesFetchPending
+    fun getLocationFetchPending(): LiveData<Boolean> = locationFetchPending
+    fun getLocationDate(): LiveData<Date> = locationDate
     fun getFetchError(): LiveData<String?> = dataFetchError
 
     fun onApiKeySelected(apiKey: String) {
@@ -40,8 +45,8 @@ class VehiclesViewModel: ViewModel() {
         viewModelScope.launch {
             repository.getVehicles().collect {
                 when(it) {
-                    is FetchResult.FetchData -> { vehiclesList.value = it.data }
-                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
+                    is FetchResult.FetchData -> { vehiclesList.value = it.data!! }
+                    is FetchResult.FetchPending -> { vehiclesFetchPending.value = it.pending }
                     is FetchResult.FetchError -> {
                         dataFetchError.value = it.message
                         dataFetchError.value = null
@@ -51,12 +56,17 @@ class VehiclesViewModel: ViewModel() {
         }
     }
 
-    fun fetchVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date) {
+    fun onLocationDateSelected(vehicleId: String, date: Date) {
+        locationDate.value = date
+        fetchVehicleLocationHistory(vehicleId, date, addDays(date, 1))
+    }
+
+    private fun fetchVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date) {
         viewModelScope.launch {
             repository.getVehicleLocationHistory(vehicleId, startDate, endDate).collect {
                 when(it) {
-                    is FetchResult.FetchData -> { vehicleLocationHistory.value = it.data }
-                    is FetchResult.FetchPending -> { dataFetchPending.value = it.pending }
+                    is FetchResult.FetchData -> { vehicleLocationHistory.value = it.data!! }
+                    is FetchResult.FetchPending -> { locationFetchPending.value = it.pending }
                     is FetchResult.FetchError -> {
                         dataFetchError.value = it.message
                         dataFetchError.value = null

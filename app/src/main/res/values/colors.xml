@@ -4,4 +4,7 @@
     <color name="primary_darker">#aeaeae</color>
     <color name="secondary">#FFFFFF</color>
     <color name="secondary_darker">#aeaeae</color>
+    <color name="map_route_color">#b3e5fc</color>
+    <color name="map_marker_color"> #1e88e5</color>
+
 </resources>

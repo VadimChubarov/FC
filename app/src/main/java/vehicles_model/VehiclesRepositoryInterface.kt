@@ -9,5 +9,5 @@ interface VehiclesRepositoryInterface {
 
     fun updateApiKey(apiKey: String)
     suspend fun getVehicles(): Flow<FetchResult<List<VehicleData>>>
-    suspend fun getVehicleLocationHistory(vehicleId: Long, startDate: Date, endDate: Date): Flow<FetchResult<List<VehicleLocationData>>>
+    suspend fun getVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date): Flow<FetchResult<List<VehicleLocationData>>>
 }

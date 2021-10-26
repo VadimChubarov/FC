@@ -18,5 +18,6 @@
     <string name="fetch_error_message">Can\'t update data, code : %1$s. Please try later</string>
     <string name="location_history_pattern">Location history: %1$s</string>
     <string name="dialog_location_title">Date</string>
+    <string name="location_history_distance_pattern">Trip distance: %.1f km</string>
 
 </resources>

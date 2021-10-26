@@ -27,13 +27,13 @@ class VehiclesActivity : AppCompatActivity() {
         viewBinding.vehiclesList.adapter = VehiclesAdapter(viewBinding.root.context, this::onVehicleSelected)
 
         viewBinding.swipeToRefreshLayout.setOnRefreshListener {
-            if(!viewModel.getFetchPending().value!!) {
+            if(!viewModel.getVehiclesFetchPending().value!!) {
                 viewModel.fetchVehicles()
             }
         }
 
         viewModel.getVehicles().observe(this, this::showVehicles)
-        viewModel.getFetchPending().observe(this, this::showLoading)
+        viewModel.getVehiclesFetchPending().observe(this, this::showLoading)
         viewModel.getFetchError().observe(this, this::showError)
     }
 
@@ -79,6 +79,7 @@ class VehiclesActivity : AppCompatActivity() {
         val fragment = LocationHistoryFragment()
         val args = Bundle()
         args.putString(LocationHistoryFragment.VEHICLE_ID, vehicleData.objectId)
+        args.putString(LocationHistoryFragment.VEHICLE_DATE, vehicleData.timestamp)
         fragment.arguments = args
         fragment.show(supportFragmentManager, LocationHistoryFragment.TAG)
     }

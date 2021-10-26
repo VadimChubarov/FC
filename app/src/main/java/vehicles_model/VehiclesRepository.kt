@@ -33,7 +33,7 @@ class VehiclesRepository private constructor() : VehiclesRepositoryInterface {
         }.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getVehicleLocationHistory (vehicleId: Long, startDate: Date, endDate: Date): Flow<FetchResult<List<VehicleLocationData>>> {
+    override suspend fun getVehicleLocationHistory (vehicleId: String, startDate: Date, endDate: Date): Flow<FetchResult<List<VehicleLocationData>>> {
         return flow {
 
             emit(FetchResult.FetchPending(true))
