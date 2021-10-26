@@ -38,6 +38,8 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
     private lateinit var datePicker: DatePicker
     private var vehicleId: String = ""
     private var map: GoogleMap? = null
+    private val markerIcon = BitmapDescriptorFactory.fromBitmap(
+        ContextCompat.getDrawable(requireActivity(), R.drawable.ic_location_marker)?.toBitmap())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
@@ -88,8 +90,10 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
     }
 
     private fun showDatePicker() {
-        if(!isLoading())
-            datePicker.showPickDate(this::selectDate)
+        if(!isLoading()) {
+            val viewModel: VehiclesViewModel by activityViewModels()
+            datePicker.showPickDate(viewModel.getLocationDate().value!!, this::selectDate)
+        }
     }
 
     private fun showSelectedDate(date: Date) {
@@ -102,6 +106,9 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
     }
 
     private fun showRoute(dataList: List<VehicleLocationData>) {
+        if(isLoading())
+            return
+
         map?.let { map ->
             val coordinates = mutableListOf<LatLng>()
             dataList.forEach {
@@ -111,31 +118,36 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
                 if(latitude != null && longitude != null)
                     coordinates.add(LatLng(latitude, longitude))
             }
-            if(coordinates.isEmpty())
-                return
 
-            val route = PolylineOptions().addAll(coordinates).apply {
-                endCap(RoundCap())
-                startCap(RoundCap())
-                width(20F)
-                color(R.color.map_route_color)
-                jointType(JointType.ROUND)
-            }
-
-            map.addPolyline(route)
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(calculateBounds(coordinates), 100))
-
-            val bitmap = ContextCompat.getDrawable(requireActivity(), R.drawable.ic_location_marker)?.toBitmap()
-            val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
-
-            val start = coordinates.first()
-            val end = coordinates.last()
-            map.addMarker(MarkerOptions().position(start).title("Start")).setIcon(markerIcon)
-            map.addMarker(MarkerOptions().position(end).title("End")).setIcon(markerIcon)
+            showPolyline(map, coordinates)
+            showMarkers(map, coordinates.first(), coordinates.last())
 
             val distance = dataList.last().distance
             distance?.let { showDistance( it / 1000) }
         }
+    }
+
+    private fun showPolyline(map: GoogleMap, coordinates: List<LatLng>) {
+        if(coordinates.isEmpty())
+            return
+
+        val line = PolylineOptions().addAll(coordinates).apply {
+            endCap(RoundCap())
+            startCap(RoundCap())
+            width(20F)
+            color(R.color.map_route_color)
+            jointType(JointType.ROUND)
+        }
+
+        map.apply {
+            addPolyline(line)
+            moveCamera(CameraUpdateFactory.newLatLngBounds(calculateBounds(coordinates), 100))
+        }
+    }
+
+    private fun showMarkers(map: GoogleMap, start: LatLng, end: LatLng) {
+        map.addMarker(MarkerOptions().position(start).title("Start")).setIcon(markerIcon)
+        map.addMarker(MarkerOptions().position(end).title("End")).setIcon(markerIcon)
     }
 
     private fun showDistance(distance: Double) {
@@ -157,6 +169,7 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
     private fun showLoading(loading: Boolean) {
         viewBinding.mapProgress.visibility = if(loading) View.VISIBLE else View.GONE
+        viewBinding.distanceText.text = ""
         enableDateSelection(!loading)
 
         if(loading)

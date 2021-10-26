@@ -7,20 +7,20 @@ import android.widget.DatePicker
 import java.util.*
 
 class DatePicker (private val context: Context) : DatePickerDialog.OnDateSetListener {
-    private var selection : Date? = null
     private var callback : ((Date) -> Unit)? = null
 
-    fun showPickDate(callback: (Date) -> Unit) {
+    fun showPickDate(date: Date = Date(), callback: (Date) -> Unit) {
         if(this.callback != null)
             return
 
         this.callback = callback
-        selection = null
-        createDateDialog().show()
+        createDateDialog(date).show()
     }
 
-    private fun createDateDialog(): Dialog {
-        val calendar = Calendar.getInstance()
+    private fun createDateDialog(date: Date): Dialog {
+        val calendar = Calendar.getInstance().apply {
+            time = date
+        }
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
