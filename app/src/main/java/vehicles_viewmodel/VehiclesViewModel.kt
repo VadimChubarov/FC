@@ -62,10 +62,7 @@ class VehiclesViewModel: ViewModel() {
                 when(fetchResult) {
                     is FetchResult.FetchData -> { vehiclesList.value = fetchResult.data!! }
                     is FetchResult.FetchPending -> { vehiclesFetchPending.value = fetchResult.pending }
-                    is FetchResult.FetchError -> {
-                        dataFetchError.value = fetchResult.message
-                        dataFetchError.value = null
-                    }
+                    is FetchResult.FetchError -> { handleError(fetchResult) }
                 }
             }
         }
