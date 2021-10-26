@@ -15,13 +15,13 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import data.VehicleLocationData
 import getDate
 import getDateString
 import java.util.*
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.fc.fctest.R
+import data.MapRouteData
 import vehicles_viewmodel.VehiclesViewModel
 
 
@@ -38,11 +38,8 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
     private lateinit var datePicker: DatePicker
     private var vehicleId: String = ""
     private var map: GoogleMap? = null
-    private val markerIcon = BitmapDescriptorFactory.fromBitmap(
-        ContextCompat.getDrawable(requireActivity(), R.drawable.ic_location_marker)?.toBitmap())
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-
         viewBinding = LocationHistoryFragmentBinding.inflate(inflater, container, false)
         datePicker = DatePicker(requireContext())
 
@@ -58,6 +55,16 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         val viewModel: VehiclesViewModel by activityViewModels()
 
+        vehicleId = arguments?.getString(VEHICLE_ID) ?: ""
+        val vehicleDate = arguments?.getString(VEHICLE_DATE) ?: ""
+
+        if(savedInstanceState == null) {
+            if (vehicleDate.isNotEmpty())
+                getDate(vehicleDate)?.let { selectDate(it) }
+            else
+                selectDate(Date())
+        }
+
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
         mapFragment.getMapAsync {
             map = it
@@ -66,18 +73,8 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         viewModel.getLocationFetchPending().observe(viewLifecycleOwner, this::showLoading)
         viewModel.getLocationDate().observe(viewLifecycleOwner, this::showSelectedDate)
-        
-        vehicleId = arguments?.getString(VEHICLE_ID) ?: ""
-        val vehicleDate = arguments?.getString(VEHICLE_DATE) ?: ""
 
         viewBinding.locationHistoryTitle.text = this.context?.getString(R.string.location_history_pattern, vehicleId)
-
-        if(savedInstanceState == null) {
-            if (vehicleDate.isNotEmpty())
-                getDate(vehicleDate)?.let { selectDate(it) }
-            else
-                selectDate(Date())
-        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -96,8 +93,8 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
         }
     }
 
-    private fun showSelectedDate(date: Date) {
-        viewBinding.dateInput.editText?.setText(getDateString(date, dateFormat))
+    private fun showSelectedDate(date: Date?) {
+        viewBinding.dateInput.editText?.setText(if(date != null) getDateString(date, dateFormat) else "")
     }
 
     private fun selectDate(date: Date) {
@@ -105,33 +102,23 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
         viewModel.onLocationDateSelected(vehicleId, date)
     }
 
-    private fun showRoute(dataList: List<VehicleLocationData>) {
-        if(isLoading())
+    private fun showRoute(mapRouteData: MapRouteData?) {
+        if(mapRouteData == null) {
             return
+        }
 
         map?.let { map ->
-            val coordinates = mutableListOf<LatLng>()
-            dataList.forEach {
-                val latitude = it.latitude
-                val longitude = it.longitude
 
-                if(latitude != null && longitude != null)
-                    coordinates.add(LatLng(latitude, longitude))
-            }
+            showPolyline(map, mapRouteData)
+            showMarkers(map, mapRouteData)
 
-            showPolyline(map, coordinates)
-            showMarkers(map, coordinates.first(), coordinates.last())
-
-            val distance = dataList.last().distance
+            val distance = mapRouteData.distance
             distance?.let { showDistance( it / 1000) }
         }
     }
 
-    private fun showPolyline(map: GoogleMap, coordinates: List<LatLng>) {
-        if(coordinates.isEmpty())
-            return
-
-        val line = PolylineOptions().addAll(coordinates).apply {
+    private fun showPolyline(map: GoogleMap, mapRouteData: MapRouteData) {
+        val line = PolylineOptions().addAll(mapRouteData.coordinates).apply {
             endCap(RoundCap())
             startCap(RoundCap())
             width(20F)
@@ -141,17 +128,28 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         map.apply {
             addPolyline(line)
-            moveCamera(CameraUpdateFactory.newLatLngBounds(calculateBounds(coordinates), 100))
+            moveCamera(CameraUpdateFactory.newLatLngBounds(mapRouteData.bounds, 100))
         }
     }
 
-    private fun showMarkers(map: GoogleMap, start: LatLng, end: LatLng) {
-        map.addMarker(MarkerOptions().position(start).title("Start")).setIcon(markerIcon)
-        map.addMarker(MarkerOptions().position(end).title("End")).setIcon(markerIcon)
+    private fun showMarkers(map: GoogleMap, mapRouteData: MapRouteData) {
+        val markerIcon = BitmapDescriptorFactory.fromBitmap(
+            ContextCompat.getDrawable(this.requireContext(), R.drawable.ic_location_marker)?.toBitmap())
+
+        map.addMarker(MarkerOptions()
+            .position(mapRouteData.start)
+            .title(getString(R.string.start_marker_title)))
+            ?.setIcon(markerIcon)
+
+        map.addMarker(MarkerOptions()
+            .position(mapRouteData.end)
+            .title(getString(R.string.end_marker_title)))
+            ?.setIcon(markerIcon)
     }
 
-    private fun showDistance(distance: Double) {
-        viewBinding.distanceText.text = getString(R.string.location_history_distance_pattern, distance)
+    private fun showDistance(distance: Double?) {
+        viewBinding.distanceText.text = if(distance != null)
+            getString(R.string.location_history_distance_pattern, distance) else ""
     }
 
     private fun enableDateSelection(enabled: Boolean) {
@@ -169,19 +167,11 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
     private fun showLoading(loading: Boolean) {
         viewBinding.mapProgress.visibility = if(loading) View.VISIBLE else View.GONE
-        viewBinding.distanceText.text = ""
         enableDateSelection(!loading)
 
-        if(loading)
+        if(loading) {
             map?.clear()
-    }
-
-    private fun calculateBounds(list: List<LatLng> ): LatLngBounds {
-        var latMin = list.minOf { it.latitude }
-        var latMax = list.maxOf { it.latitude }
-        var longMib = list.minOf { it.longitude }
-        var longMax = list.maxOf { it.longitude }
-
-        return LatLngBounds(LatLng(latMin, longMib), LatLng(latMax, longMax))
+            showDistance(null)
+        }
     }
 }

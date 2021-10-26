@@ -19,5 +19,7 @@
     <string name="location_history_pattern">Location history: %1$s</string>
     <string name="dialog_location_title">Date</string>
     <string name="location_history_distance_pattern">Trip distance: %.1f km</string>
+    <string name="start_marker_title">Start</string>
+    <string name="end_marker_title">End</string>
 
 </resources>

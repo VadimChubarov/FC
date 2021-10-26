@@ -15,13 +15,14 @@ import java.util.concurrent.TimeUnit
 class VehiclesNetworkRepository {
 
     private val networkApi: VehiclesNetworkInterface
+    private val httpClient: OkHttpClient
     private val baseUrl = "https://app.ecofleet.com/seeme/Api/Vehicles/"
     private var apiKey = ""
     private val dateFormat = "yy-MM-dd"
 
     init
     {
-        val client = OkHttpClient.Builder()
+       httpClient = OkHttpClient.Builder()
             .addInterceptor(ApiInterceptor())
             .readTimeout(5, TimeUnit.MINUTES)
             .connectTimeout(5, TimeUnit.MINUTES)
@@ -29,7 +30,7 @@ class VehiclesNetworkRepository {
 
         networkApi = Retrofit.Builder()
             .baseUrl(baseUrl)
-            .client(client)
+            .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build().create(VehiclesNetworkInterface::class.java)
     }
@@ -39,14 +40,19 @@ class VehiclesNetworkRepository {
     }
 
     suspend fun getVehicles(): FetchResult<List<VehicleData>> {
-        return processResponse { networkApi.getVehicles() }
+        val tag = VehiclesNetworkInterface.VEHICLES_TAG
+        cancelPending(tag)
+        return processResponse { networkApi.getVehicles(tag) }
     }
 
     suspend fun getVehicleLocationHistory(vehicleId: String, startDate: Date, endDate: Date): FetchResult<List<VehicleLocationData>> {
+        val tag = VehiclesNetworkInterface.VEHICLE_LOCATION_TAG
+        cancelPending(tag)
+
         val startDateString = getDateString(startDate, dateFormat)!!
         val endDateString = getDateString(endDate, dateFormat)!!
 
-        return processResponse { networkApi.getVehicleLocationHistory(vehicleId, startDateString, endDateString) }
+        return processResponse { networkApi.getVehicleLocationHistory(tag, vehicleId, startDateString, endDateString) }
     }
 
     private suspend fun <T>processResponse(request: suspend () -> Response<VehiclesResponse<T>>): FetchResult<T> {
@@ -64,6 +70,20 @@ class VehiclesNetworkRepository {
             }
         } else
             FetchResult.FetchError("Missing api key")
+    }
+
+    private fun cancelPending(tag: String) {
+        for (call in httpClient.dispatcher.queuedCalls()) {
+            if(call.request().header("tag") == tag) {
+                call.cancel()
+            }
+        }
+
+        for (call in httpClient.dispatcher.runningCalls()) {
+            if(call.request().header("tag") == tag) {
+                call.cancel()
+            }
+        }
     }
 
     private inner class ApiInterceptor: Interceptor {
