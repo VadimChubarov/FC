@@ -78,8 +78,7 @@ class VehiclesActivity : AppCompatActivity() {
 
         val fragment = LocationHistoryFragment()
         val args = Bundle()
-        args.putString(LocationHistoryFragment.VEHICLE_ID, vehicleData.objectId)
-        args.putString(LocationHistoryFragment.VEHICLE_DATE, vehicleData.timestamp)
+        args.putParcelable(LocationHistoryFragment.VEHICLE_DATA, vehicleData)
         fragment.arguments = args
         fragment.show(supportFragmentManager, LocationHistoryFragment.TAG)
     }

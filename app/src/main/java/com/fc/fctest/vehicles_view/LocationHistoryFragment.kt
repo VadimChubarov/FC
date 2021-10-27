@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.fc.fctest.R
 import data.MapRouteData
+import data.VehicleData
 import vehicles_viewmodel.VehiclesViewModel
 
 
@@ -30,14 +31,13 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "LocationHistoryFragment"
-        const val VEHICLE_ID = "vehicle_id"
-        const val VEHICLE_DATE = "vehicle_date"
+        const val VEHICLE_DATA = "vehicle_data"
     }
 
     private val dateFormat = "dd / MM / yyyy"
     private lateinit var viewBinding: LocationHistoryFragmentBinding
     private lateinit var datePicker: DatePicker
-    private var vehicleId: String = ""
+    private var vehicleData: VehicleData? = null
     private var map: GoogleMap? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -56,14 +56,19 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
         val viewModel: VehiclesViewModel by activityViewModels()
 
-        vehicleId = arguments?.getString(VEHICLE_ID) ?: ""
-        val vehicleDate = arguments?.getString(VEHICLE_DATE) ?: ""
+        vehicleData = arguments?.getParcelable(VEHICLE_DATA)
+        if(vehicleData == null) {
+            dismiss()
+            return
+        }
+
+        val vehicleDate = vehicleData!!.timestamp
 
         if(savedInstanceState == null) {
-            if (vehicleDate.isNotEmpty())
-                getDate(vehicleDate)?.let { selectDate(it) }
-            else
+            if (vehicleDate.isNullOrEmpty())
                 selectDate(Date())
+            else
+                getDate(vehicleDate)?.let { selectDate(it) }
         }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment) as SupportMapFragment
@@ -75,7 +80,9 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
         viewModel.getLocationFetchPending().observe(viewLifecycleOwner, this::showLoading)
         viewModel.getLocationDate().observe(viewLifecycleOwner, this::showSelectedDate)
 
-        viewBinding.locationHistoryTitle.text = this.context?.getString(R.string.location_history_pattern, vehicleId)
+        val plateNumber = vehicleData!!.plate
+        if(!plateNumber.isNullOrEmpty())
+            viewBinding.locationHistoryTitle.text = this.context?.getString(R.string.location_history_pattern, plateNumber)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -109,7 +116,7 @@ class LocationHistoryFragment: BottomSheetDialogFragment() {
 
     private fun selectDate(date: Date) {
         val viewModel: VehiclesViewModel by activityViewModels()
-        viewModel.onLocationDateSelected(vehicleId, date)
+        viewModel.onLocationDateSelected(vehicleData!!.objectId!!, date)
     }
 
     private fun showRoute(mapRouteData: MapRouteData?) {
